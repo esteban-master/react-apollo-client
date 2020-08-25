@@ -1,4 +1,5 @@
 import React from "react";
+import TokenService from "../services/token.service";
 import { graphql_request } from "../config/graphql-client";
 import AppLayout from "../components/AppLayout";
 
@@ -13,10 +14,12 @@ const query = graphql_request.gql`
   }
 `;
 const Productos = ({ productos }) => {
+  console.log("Hola");
+  console.log(productos);
   return (
     <AppLayout title="Productos">
       <div>
-        <h1>PRODUCTOS LISTAS</h1>
+        <h1>PRODUCTOS LISTAS PREMIUM</h1>
         <ul>
           {productos.map((pro) => (
             <li key={pro.id}>{pro.nombre}</li>
@@ -27,7 +30,9 @@ const Productos = ({ productos }) => {
   );
 };
 
-export async function getStaticProps() {
+export async function getServerSideProps(context) {
+  const tokenService = new TokenService();
+  await tokenService.autenticatedToken(context);
   const data = await graphql_request.client.request(query);
   return {
     props: {

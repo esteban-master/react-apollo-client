@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import TokenService from "../services/token.service";
 import { graphql_request } from "../config/graphql-client";
 import { useRouter } from "next/router";
 import AppLayout from "../components/AppLayout";
@@ -28,10 +29,18 @@ const Login = () => {
       const data = await graphql_request.client.request(AUTENTICAR_USUARIO, {
         input: { ...values },
       });
-      console.log("DATA GRAPHQL REQUEST: ", data);
-      router.replace("/");
+
+      if (data.autenticarUsuario) {
+        console.log("DATA GRAPHQL REQUEST: ", data.autenticarUsuario.token);
+        const tokenService = new TokenService();
+        try {
+          tokenService.guardarToken(data.autenticarUsuario.token);
+          router.replace("/");
+        } catch (error) {
+          console.log("Erroor: ", error);
+        }
+      }
     } catch (error) {
-      console.log(error.response.errors[0].message);
       setMensaje(error.response.errors[0].message);
       setTimeout(() => setMensaje(null), 3000);
     }
@@ -51,8 +60,8 @@ const Login = () => {
           <div className="w-full max-w-sm">
             <Formik
               initialValues={{
-                email: router.query.email || "",
-                password: "",
+                email: router.query.email || "next_cliente@gmail.com",
+                password: "1234",
               }}
               validationSchema={Yup.object({
                 email: Yup.string()
