@@ -1,79 +1,72 @@
 import React, { useState } from "react";
-import TokenService from "../services/token.service";
-import { useAuth } from "../services/authcontext.service";
-import { graphql_request } from "../config/graphql-client";
 import { useRouter } from "next/router";
 import AppLayout from "../components/AppLayout";
+import { graphql_request } from "../config/graphql-client";
 import { Formik, Form } from "formik";
 import { InputText } from "../components/InputText";
 import * as Yup from "yup";
-import Link from "next/link";
 
-const AUTENTICAR_USUARIO = graphql_request.gql`
-  mutation autenticarUsuario($input: AutenticarInput) {
-    autenticarUsuario(input: $input) {
-      token
-      usuario {
-        nombre
-        apellido
-        email
-      }
+const NUEVA_CUENTA = graphql_request.gql`
+  mutation nuevoUsuario($usuario: UsuarioInput) {
+    nuevoUsuario(usuario: $usuario) {
+      nombre
+      email
     }
   }
 `;
 
-const Login = () => {
-  const [mensaje, setMensaje] = useState(null);
-  const [, dispatch] = useAuth();
-
+const NuevaCuenta = () => {
   const router = useRouter();
+  const [mensaje, setMensaje] = useState(null);
 
   async function handleSubmit(values) {
     try {
-      setMensaje("Autenticando...");
-      const data = await graphql_request.client.request(AUTENTICAR_USUARIO, {
-        input: { ...values },
+      const data = await graphql_request.client.request(NUEVA_CUENTA, {
+        usuario: { ...values },
       });
 
-      if (data.autenticarUsuario) {
-        const tokenService = new TokenService();
-        try {
-          tokenService.guardarToken(data.autenticarUsuario.token);
-          dispatch({
-            type: "setDetallesAutenticacion",
-            payload: {
-              ...data.autenticarUsuario.usuario,
+      setMensaje(`Usuario ${data.nuevoUsuario.nombre}, creado exitosamente!`);
+      setTimeout(
+        () =>
+          router.push(
+            {
+              pathname: "/login",
+              query: { email: data.nuevoUsuario.email },
             },
-          });
-          router.replace("/");
-        } catch (error) {
-          console.log("Erroor: ", error);
-        }
-      }
+            "/login"
+          ),
+        1500
+      );
     } catch (error) {
-      setMensaje(error.response.errors[0].message);
-      setTimeout(() => setMensaje(null), 3000);
+      setMensaje(error.message);
+      setTimeout(() => setMensaje(null), 3500);
     }
   }
 
   return (
     <>
-      <AppLayout title="Login">
+      <AppLayout title="Sign Up | CRM ">
         {mensaje && (
           <div className="bg-white py-2 px-3 w-full my-3 max-w-sm text-center mx-auto">
             <p>{mensaje}</p>
           </div>
         )}
 
-        <h1 className="text-center text-2xl text-white font-light">Login</h1>
+        <h1 className="text-center text-2xl text-white font-light">
+          Crear Nueva Cuenta
+        </h1>
         <div className="flex justify-center mt-5">
           <div className="w-full max-w-sm">
             <Formik
               initialValues={{
-                email: router.query.email || "next_cliente@gmail.com",
-                password: "1234",
+                nombre: "",
+                apellido: "",
+                email: "",
+                password: "",
               }}
               validationSchema={Yup.object({
+                nombre: Yup.string().required("El nombre es obligatorio"),
+                apellido: Yup.string().required("El apellido es obligatorio"),
                 email: Yup.string()
                   .email("El email no es valido")
                   .required("Email es obligatorio"),
@@ -85,6 +78,24 @@ const Login = () => {
             >
               {(formik) => (
                 <Form className="bg-white rounded shadow-md px-8 pt-6 pb-6 pb-8 mb-4">
+                  <div className="mb-4">
+                    <InputText
+                      label="Nombre"
+                      name="nombre"
+                      id="nombre"
+                      type="text"
+                      placeholder="Nombre Usuario"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <InputText
+                      label="Apellido"
+                      name="apellido"
+                      id="apellido"
+                      type="text"
+                      placeholder="Apellido Usuario"
+                    />
+                  </div>
                   <div className="mb-4">
                     <InputText
                       label="Email"
@@ -103,24 +114,22 @@ const Login = () => {
                       placeholder="Password Usuario"
                     />
                   </div>
+
                   <button
                     type="submit"
                     disabled={formik.isSubmitting}
                     className="bg-gray-800 w-full mt-5 p-2 text-white uppercase hover:bg-gray-700"
                   >
-                    Iniciar Sesion
+                    Registrar
                   </button>
                 </Form>
               )}
             </Formik>
           </div>
-          <Link href="/nuevacuenta">
-            <a>Registrar</a>
-          </Link>
         </div>
       </AppLayout>
     </>
   );
 };
 
-export default Login;
+export default NuevaCuenta;

@@ -35,6 +35,11 @@ class TokenService {
     });
   }
 
+  getToken() {
+    const cookies = new Cookies();
+    return cookies.get("token");
+  }
+
   async autenticatedToken(contexto) {
     const ssr = contexto.req ? true : false;
     const cookies = new Cookies(ssr ? contexto.req.headers.cookie : null);

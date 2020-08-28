@@ -1,5 +1,6 @@
 import React from "react";
 import TokenService from "../services/token.service";
+import { useAuth } from "../services/authcontext.service";
 import { graphql_request } from "../config/graphql-client";
 import AppLayout from "../components/AppLayout";
 
@@ -14,10 +15,10 @@ const query = graphql_request.gql`
   }
 `;
 const Productos = ({ productos }) => {
-  console.log("Hola");
-  console.log(productos);
+  const [user] = useAuth();
+  console.log("USER productos: ", user);
   return (
-    <AppLayout title="Productos">
+    <AppLayout title="CRM | Productos">
       <div>
         <h1>PRODUCTOS LISTAS PREMIUM</h1>
         <ul>
