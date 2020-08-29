@@ -1,9 +1,9 @@
 import Cookies from "universal-cookie";
-import { graphql_request } from "../config/graphql-client";
+import { client, gql } from "../config/apollo_client";
 import NavService from "../services/nav.service";
 
-const VALIDATE_TOKEN = graphql_request.gql`
-  query ValidateToken($token:String!) {
+const VALIDATE_TOKEN = gql`
+  query ValidateToken($token: String!) {
     validateToken(token: $token) {
       success
     }
@@ -24,14 +24,11 @@ class TokenService {
   }
 
   checkAuthToken(token) {
-    if (!token)
-      return {
-        validateToken: {
-          success: false,
-        },
-      };
-    return graphql_request.client.request(VALIDATE_TOKEN, {
-      token,
+    return client.query({
+      query: VALIDATE_TOKEN,
+      variables: {
+        token: token || "",
+      },
     });
   }
 
@@ -47,8 +44,9 @@ class TokenService {
 
     // console.log("SSR: ", ssr, contexto.req.headers);
 
-    const response = await this.checkAuthToken(token);
-    if (!response.validateToken.success) {
+    const { data } = await this.checkAuthToken(token);
+    console.log("res: ", data);
+    if (!data.validateToken.success) {
       const navService = new NavService();
       this.borrarToken();
       navService.redirectUser("/login", contexto);

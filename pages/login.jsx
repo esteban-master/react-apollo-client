@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TokenService from "../services/token.service";
 import { useAuth } from "../services/authcontext.service";
-import { graphql_request } from "../config/graphql-client";
+import { useMutation, gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import AppLayout from "../components/AppLayout";
 import { Formik, Form } from "formik";
@@ -9,7 +9,7 @@ import { InputText } from "../components/InputText";
 import * as Yup from "yup";
 import Link from "next/link";
 
-const AUTENTICAR_USUARIO = graphql_request.gql`
+const AUTENTICAR_USUARIO = gql`
   mutation autenticarUsuario($input: AutenticarInput) {
     autenticarUsuario(input: $input) {
       token
@@ -23,18 +23,21 @@ const AUTENTICAR_USUARIO = graphql_request.gql`
 `;
 
 const Login = () => {
+  const [autenticarUsuario] = useMutation(AUTENTICAR_USUARIO);
   const [mensaje, setMensaje] = useState(null);
   const [, dispatch] = useAuth();
 
   const router = useRouter();
 
   async function handleSubmit(values) {
+    console.log(values);
     try {
       setMensaje("Autenticando...");
-      const data = await graphql_request.client.request(AUTENTICAR_USUARIO, {
-        input: { ...values },
+      const { data } = await autenticarUsuario({
+        variables: {
+          input: { ...values },
+        },
       });
-
       if (data.autenticarUsuario) {
         const tokenService = new TokenService();
         try {
@@ -51,7 +54,7 @@ const Login = () => {
         }
       }
     } catch (error) {
-      setMensaje(error.response.errors[0].message);
+      setMensaje(error.message);
       setTimeout(() => setMensaje(null), 3000);
     }
   }
@@ -113,10 +116,10 @@ const Login = () => {
                 </Form>
               )}
             </Formik>
+            <Link href="/nuevacuenta">
+              <a>Registrar</a>
+            </Link>
           </div>
-          <Link href="/nuevacuenta">
-            <a>Registrar</a>
-          </Link>
         </div>
       </AppLayout>
     </>

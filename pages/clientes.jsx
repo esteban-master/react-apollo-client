@@ -1,41 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery, gql } from "@apollo/client";
 import TokenService from "../services/token.service";
-import { graphql_request } from "../config/graphql-client";
 import AppLayout from "../components/AppLayout";
 import Link from "next/link";
 
-const GET_CLIENTES_USUARIO = graphql_request.gql`
+const GET_CLIENTES_USUARIO = gql`
   query GET_CLIENTES_USUARIO {
     obtenerClientesVendedor {
       id
       nombre
       empresa
       email
-      apellido
     }
   }
 `;
 
 const Clientes = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  async function getClientes() {
-    setLoading(true);
-    const tokenService = new TokenService();
-    graphql_request.client.setHeader(
-      "authorization",
-      `Bearer ${tokenService.getToken()}`
-    );
-    const data = await graphql_request.client.request(GET_CLIENTES_USUARIO);
-    setData(data);
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    getClientes();
-  }, []);
-
+  const { data, error, loading } = useQuery(GET_CLIENTES_USUARIO);
+  console.log("data: ", data, error, loading);
   return (
     <AppLayout title="CRM | Clientes">
       <h1 className="text-2xl text-gray-800 font-light">Clientes</h1>
@@ -46,7 +28,7 @@ const Clientes = () => {
         </a>
       </Link>
       <br />
-
+      {loading && <p>Cargando...</p>}
       {data && data.obtenerClientesVendedor.length !== 0 && !loading ? (
         <table className="table-auto shadow-md mt-10 w-full w-lg">
           <thead className="bg-gray-800">

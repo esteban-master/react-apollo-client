@@ -1,10 +1,8 @@
 import React from "react";
-import TokenService from "../services/token.service";
-import { useAuth } from "../services/authcontext.service";
-import { graphql_request } from "../config/graphql-client";
+import { useQuery, gql } from "@apollo/client";
 import AppLayout from "../components/AppLayout";
 
-const query = graphql_request.gql`
+const GET_PRODUCTOS = gql`
   query GET_PRODUCTOS {
     obtenerProductos {
       nombre
@@ -14,32 +12,36 @@ const query = graphql_request.gql`
     }
   }
 `;
-const Productos = ({ productos }) => {
-  const [user] = useAuth();
-  console.log("USER productos: ", user);
+const Productos = () => {
+  const { loading, error, data } = useQuery(GET_PRODUCTOS);
+  console.log(loading, data);
   return (
     <AppLayout title="CRM | Productos">
       <div>
         <h1>PRODUCTOS LISTAS PREMIUM</h1>
-        <ul>
-          {productos.map((pro) => (
-            <li key={pro.id}>{pro.nombre}</li>
-          ))}
-        </ul>
+        {!loading && data.obtenerProductos.length > 0 ? (
+          <ul>
+            {data.obtenerProductos.map((pro) => (
+              <li key={pro.id}>{pro.nombre}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>Sin productos</p>
+        )}
       </div>
     </AppLayout>
   );
 };
 
-export async function getServerSideProps(context) {
-  const tokenService = new TokenService();
-  await tokenService.autenticatedToken(context);
-  const data = await graphql_request.client.request(query);
-  return {
-    props: {
-      productos: data.obtenerProductos,
-    },
-  };
-}
+// export async function getServerSideProps(context) {
+//   const tokenService = new TokenService();
+//   await tokenService.autenticatedToken(context);
+//   const data = await graphql_request.client.request(query);
+//   return {
+//     props: {
+//       productos: data.obtenerProductos,
+//     },
+//   };
+// }
 
 export default Productos;
