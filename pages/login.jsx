@@ -4,10 +4,7 @@ import { useAuth } from "../services/authcontext.service";
 import { useMutation, gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import AppLayout from "../components/AppLayout";
-import { Formik, Form } from "formik";
-import { InputText } from "../components/InputText";
-import * as Yup from "yup";
-import Link from "next/link";
+import FormLogin from "../components/FormLogin";
 
 const AUTENTICAR_USUARIO = gql`
   mutation autenticarUsuario($input: AutenticarInput) {
@@ -25,9 +22,10 @@ const AUTENTICAR_USUARIO = gql`
 const Login = () => {
   const [autenticarUsuario] = useMutation(AUTENTICAR_USUARIO);
   const [mensaje, setMensaje] = useState(null);
-  const [, dispatch] = useAuth();
+  const [, authDispatch] = useAuth();
 
   const router = useRouter();
+  console.log("router: ", router);
 
   async function handleSubmit(values) {
     console.log(values);
@@ -42,7 +40,7 @@ const Login = () => {
         const tokenService = new TokenService();
         try {
           tokenService.guardarToken(data.autenticarUsuario.token);
-          dispatch({
+          authDispatch({
             type: "setDetallesAutenticacion",
             payload: {
               ...data.autenticarUsuario.usuario,
@@ -71,54 +69,7 @@ const Login = () => {
         <h1 className="text-center text-2xl text-white font-light">Login</h1>
         <div className="flex justify-center mt-5">
           <div className="w-full max-w-sm">
-            <Formik
-              initialValues={{
-                email: router.query.email || "next_cliente@gmail.com",
-                password: "1234",
-              }}
-              validationSchema={Yup.object({
-                email: Yup.string()
-                  .email("El email no es valido")
-                  .required("Email es obligatorio"),
-                password: Yup.string()
-                  .required("El password no puede ir vacio")
-                  .min(4, "Minimo 4 caracteres"),
-              })}
-              onSubmit={handleSubmit}
-            >
-              {(formik) => (
-                <Form className="bg-white rounded shadow-md px-8 pt-6 pb-6 pb-8 mb-4">
-                  <div className="mb-4">
-                    <InputText
-                      label="Email"
-                      name="email"
-                      id="email"
-                      type="email"
-                      placeholder="Email Usuario"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <InputText
-                      label="Password"
-                      name="password"
-                      id="password"
-                      type="password"
-                      placeholder="Password Usuario"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={formik.isSubmitting}
-                    className="bg-gray-800 w-full mt-5 p-2 text-white uppercase hover:bg-gray-700"
-                  >
-                    Iniciar Sesion
-                  </button>
-                </Form>
-              )}
-            </Formik>
-            <Link href="/nuevacuenta">
-              <a>Registrar</a>
-            </Link>
+            <FormLogin handleSubmit={handleSubmit} />
           </div>
         </div>
       </AppLayout>

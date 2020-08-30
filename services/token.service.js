@@ -20,16 +20,20 @@ class TokenService {
   borrarToken() {
     const cookies = new Cookies();
     cookies.remove("token", { path: "/" });
-    return;
+    return Promise.resolve();
   }
 
   checkAuthToken(token) {
-    return client.query({
-      query: VALIDATE_TOKEN,
-      variables: {
-        token: token || "",
-      },
-    });
+    try {
+      return client.query({
+        query: VALIDATE_TOKEN,
+        variables: {
+          token: token || "",
+        },
+      });
+    } catch (error) {
+      console.log("ERRORSITO: ", error.message);
+    }
   }
 
   getToken() {
@@ -42,13 +46,13 @@ class TokenService {
     const cookies = new Cookies(ssr ? contexto.req.headers.cookie : null);
     const token = cookies.get("token");
 
-    // console.log("SSR: ", ssr, contexto.req.headers);
+    console.log("SSR: ", contexto.req.headers);
 
     const { data } = await this.checkAuthToken(token);
+
     console.log("res: ", data);
     if (!data.validateToken.success) {
       const navService = new NavService();
-      this.borrarToken();
       navService.redirectUser("/login", contexto);
     }
   }

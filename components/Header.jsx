@@ -15,10 +15,14 @@ const Header = () => {
     tokenService.borrarToken();
     Router.push("/login");
   };
+
+  const iniciarSesion = () => {
+    Router.push("/login");
+  };
   return (
     <div>
       <div className="flex justify-end">
-        {user && (
+        {user.email ? (
           <>
             <p className="mr-2">{`${user.nombre} ${user.apellido}`}</p>
             <button
@@ -29,6 +33,14 @@ const Header = () => {
               Cerrar sesion
             </button>
           </>
+        ) : (
+          <button
+            onClick={iniciarSesion}
+            className="bg-blue-800 w-full sm:w-auto font-bold uppercase text-xs rounded py-1 px-2 text-white shadow-md"
+            type="button"
+          >
+            Iniciar sesion
+          </button>
         )}
       </div>
     </div>

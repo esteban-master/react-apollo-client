@@ -11,6 +11,7 @@ const GET_CLIENTES_USUARIO = gql`
       nombre
       empresa
       email
+      apellido
     }
   }
 `;

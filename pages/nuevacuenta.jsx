@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import AppLayout from "../components/AppLayout";
-import { graphql_request } from "../config/graphql-client";
+import { gql, useMutation } from "@apollo/client";
 import { Formik, Form } from "formik";
 import { InputText } from "../components/InputText";
 import * as Yup from "yup";
 
-const NUEVA_CUENTA = graphql_request.gql`
+const NUEVA_CUENTA = gql`
   mutation nuevoUsuario($usuario: UsuarioInput) {
     nuevoUsuario(usuario: $usuario) {
       nombre
@@ -17,14 +17,16 @@ const NUEVA_CUENTA = graphql_request.gql`
 
 const NuevaCuenta = () => {
   const router = useRouter();
+  const [nuevoUsuario] = useMutation(NUEVA_CUENTA);
   const [mensaje, setMensaje] = useState(null);
 
   async function handleSubmit(values) {
     try {
-      const data = await graphql_request.client.request(NUEVA_CUENTA, {
-        usuario: { ...values },
+      const { data } = await nuevoUsuario({
+        variables: {
+          usuario: { ...values },
+        },
       });
-
       setMensaje(`Usuario ${data.nuevoUsuario.nombre}, creado exitosamente!`);
       setTimeout(
         () =>
