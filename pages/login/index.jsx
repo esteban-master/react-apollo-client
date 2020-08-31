@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import TokenService from "../services/token.service";
-import { useAuth } from "../services/authcontext.service";
+import React, { useState, useEffect } from "react";
+import TokenService from "../../services/token.service";
+import { useAuth } from "../../services/authcontext.service";
 import { useMutation, gql } from "@apollo/client";
 import { useRouter } from "next/router";
-import AppLayout from "../components/AppLayout";
-import FormLogin from "../components/FormLogin";
+import AppLayout from "../../components/AppLayout";
+import FormLogin from "./FormLogin";
 
 const AUTENTICAR_USUARIO = gql`
   mutation autenticarUsuario($input: AutenticarInput) {
@@ -20,15 +20,24 @@ const AUTENTICAR_USUARIO = gql`
 `;
 
 const Login = () => {
+  const tokenService = new TokenService();
   const [autenticarUsuario] = useMutation(AUTENTICAR_USUARIO);
   const [mensaje, setMensaje] = useState(null);
   const [, authDispatch] = useAuth();
-
   const router = useRouter();
-  console.log("router: ", router);
+
+  useEffect(() => {
+    if (router.query.tokenValid === "false") {
+      tokenService.borrarToken();
+      authDispatch({
+        type: "removeDetallesAutenticacion",
+      });
+      setMensaje("Sesion expirada, inicia denuevo");
+    }
+  }, [router]);
 
   async function handleSubmit(values) {
-    console.log(values);
+    // console.log(values);
     try {
       setMensaje("Autenticando...");
       const { data } = await autenticarUsuario({
@@ -37,7 +46,6 @@ const Login = () => {
         },
       });
       if (data.autenticarUsuario) {
-        const tokenService = new TokenService();
         try {
           tokenService.guardarToken(data.autenticarUsuario.token);
           authDispatch({

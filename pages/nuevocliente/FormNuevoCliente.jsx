@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, Form } from "formik";
-import { InputText } from "../components/InputText";
+import { InputText } from "../../components/InputText";
 import * as Yup from "yup";
 
 const FormNuevoCliente = ({ handleSubmit }) => {

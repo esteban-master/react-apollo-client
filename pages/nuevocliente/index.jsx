@@ -1,8 +1,8 @@
 import React from "react";
 import { gql, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
-import AppLayout from "../components/AppLayout";
-import FormNuevoCliente from "../components/FormNuevoCliente";
+import AppLayout from "../../components/AppLayout";
+import FormNuevoCliente from "./FormNuevoCliente";
 
 const NUEVO_CLIENTE = gql`
   mutation NewCliente($input: ClienteInput) {

@@ -1,5 +1,4 @@
 import React from "react";
-// import { useQuery, gql } from "@apollo/client";
 import { client, gql } from "../config/apollo_client";
 import AppLayout from "../components/AppLayout";
 
@@ -14,9 +13,6 @@ const GET_PRODUCTOS = gql`
   }
 `;
 const Productos = ({ productos }) => {
-  // const { loading, error, data } = useQuery(GET_PRODUCTOS);
-  // console.log(loading, data);
-  console.log("PRODUCTOS: ", productos);
   return (
     <AppLayout title="CRM | Productos">
       <div>
@@ -42,7 +38,7 @@ export async function getStaticProps(context) {
   return {
     props: {
       productos: data.obtenerProductos,
-    }, // will be passed to the page component as props
+    },
   };
 }
 

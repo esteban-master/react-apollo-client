@@ -1,20 +1,24 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useAuth } from "../services/authcontext.service";
+import TokenService from "../services/token.service";
 
 const Sidebar = () => {
+  const tokenService = new TokenService();
   const { pathname } = useRouter();
-  const [user] = useAuth();
 
   return (
     <aside className="bg-gray-800 sm:w-1/3 xl:w-1/5 sm:min-h-sreen p-5">
       <div>
-        <p className="text-white text-2xl font-black">CRM Clientes</p>
+        <p className="text-white text-2xl font-black">
+          <Link href="/">
+            <a> CRM Clientes</a>
+          </Link>
+        </p>
       </div>
 
       <nav className="mt-5 list-none">
-        {user.email && (
+        {tokenService.getToken() && (
           <>
             <li
               className={pathname === "/clientes" ? "bg-blue-800 p-2" : "p-2"}

@@ -1,8 +1,9 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
-import TokenService from "../services/token.service";
-import AppLayout from "../components/AppLayout";
+import TokenService from "../../services/token.service";
+import AppLayout from "../../components/AppLayout";
 import Link from "next/link";
+import Cliente from "./Cliente";
 
 const GET_CLIENTES_USUARIO = gql`
   query GET_CLIENTES_USUARIO {
@@ -17,8 +18,8 @@ const GET_CLIENTES_USUARIO = gql`
 `;
 
 const Clientes = () => {
-  const { data, error, loading } = useQuery(GET_CLIENTES_USUARIO);
-  console.log("data: ", data, error, loading);
+  const { data, loading } = useQuery(GET_CLIENTES_USUARIO);
+
   return (
     <AppLayout title="CRM | Clientes">
       <h1 className="text-2xl text-gray-800 font-light">Clientes</h1>
@@ -37,18 +38,13 @@ const Clientes = () => {
               <th className="w-1/5 py-2">Nombre</th>
               <th className="w-1/5 py-2">Empresa</th>
               <th className="w-1/5 py-2">Email</th>
+              <th className="w-1/5 py-2"></th>
             </tr>
           </thead>
 
           <tbody className="bg-white">
             {data.obtenerClientesVendedor.map((cli) => (
-              <tr key={cli.id}>
-                <td className="border px-4 py-2">
-                  {cli.nombre} {cli.apellido}
-                </td>
-                <td className="border px-4 py-2">{cli.empresa}</td>
-                <td className="border px-4 py-2">{cli.email}</td>
-              </tr>
+              <Cliente cliente={cli} key={cli.id} />
             ))}
           </tbody>
         </table>

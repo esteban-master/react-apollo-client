@@ -29,9 +29,6 @@ const reducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
   let localState = null;
   if (typeof localStorage !== "undefined" && localStorage.getItem("userInfo")) {
-    // const {email} = JSON.parse(localStorage.getItem('userInfo'))
-    // console.log(email)
-
     localState = JSON.parse(localStorage.getItem("userInfo") || "");
   }
 

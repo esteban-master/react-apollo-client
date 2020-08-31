@@ -46,7 +46,7 @@ class TokenService {
     const cookies = new Cookies(ssr ? contexto.req.headers.cookie : null);
     const token = cookies.get("token");
 
-    console.log("SSR: ", contexto.req.headers);
+    // console.log("SSR: ", contexto.req.headers);
 
     const { data } = await this.checkAuthToken(token);
 

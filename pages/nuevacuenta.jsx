@@ -21,6 +21,7 @@ const NuevaCuenta = () => {
   const [mensaje, setMensaje] = useState(null);
 
   async function handleSubmit(values) {
+    setMensaje("Creando cuenta...");
     try {
       const { data } = await nuevoUsuario({
         variables: {

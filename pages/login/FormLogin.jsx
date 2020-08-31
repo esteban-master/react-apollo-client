@@ -1,15 +1,17 @@
 import React from "react";
 import { Formik, Form } from "formik";
-import { InputText } from "./InputText";
+import { InputText } from "../../components/InputText";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
+import { useAuth } from "../../services/authcontext.service";
 
 const FormLogin = ({ handleSubmit }) => {
-  const { query } = useRouter();
+  const { query, push } = useRouter();
+  const [user] = useAuth();
   return (
     <Formik
       initialValues={{
-        email: query.email || "next_cliente@gmail.com",
+        email: query.email || user.email || "",
         password: "",
       }}
       validationSchema={Yup.object({
@@ -45,9 +47,17 @@ const FormLogin = ({ handleSubmit }) => {
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="bg-gray-800 w-full mt-5 p-2 text-white uppercase hover:bg-gray-700"
+            className="bg-green-800 w-full mt-5 p-2 text-white uppercase hover:bg-green-700"
           >
             Iniciar Sesion
+          </button>
+
+          <button
+            type="button"
+            className="bg-gray-800 w-full mt-5 p-2 text-white uppercase hover:bg-gray-700"
+            onClick={() => push("/nuevacuenta")}
+          >
+            Registrar
           </button>
         </Form>
       )}

@@ -4,8 +4,7 @@ class NavService {
   redirectUser(dest, ctx) {
     const res = ctx.res;
     if (res) {
-      res.setHeader("authorization", "Bearer ");
-      res.writeHead(302, { Location: dest });
+      res.writeHead(302, { Location: dest + "?tokenValid=false" });
       res.end();
       return;
     } else {
